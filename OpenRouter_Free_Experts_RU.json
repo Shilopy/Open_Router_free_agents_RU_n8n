@@ -19,7 +19,7 @@
             {
               "id": "api-key",
               "name": "openrouter_api_key",
-              "value": "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",
+              "value": "sk-or-v1-ВСТАВЬТЕ СЮДА СВОЙ КЛЮЧ OPEN_ROUTER_API_KEY", ----------------------------------------------------ВАЖНО
               "type": "string"
             },
             {
