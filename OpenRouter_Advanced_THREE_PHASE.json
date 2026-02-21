@@ -17,12 +17,6 @@
         "assignments": {
           "assignments": [
             {
-              "id": "api-key",
-              "name": "openrouter_api_key",
-              "value": "YOUR_OPENROUTER_API_KEY_HERE",
-              "type": "string"
-            },
-            {
               "id": "test-mode",
               "name": "test_mode",
               "value": "auto",
@@ -165,7 +159,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const delay = ms => new Promise(resolve => setTimeout(resolve, ms));\nconst config = $('🎭 Apply Task Preset').first().json;\nconst rateLimit = config.rate_limit_ms || 2000;\nconst apiKey = config.openrouter_api_key;\n\nawait delay(rateLimit);\n\nconst modelData = $input.first().json;\nconsole.log(`\\n⏳ [PHASE 1] Quick test: ${modelData.model_id}`);\nconsole.log(`   Pre-score: ${modelData.scores.composite.toFixed(2)}/10`);\n\nreturn [{\n  json: {\n    ...modelData,\n    openrouter_api_key: apiKey,\n    started_at: Date.now(),\n    test_results: {}\n  }\n}];"
+        "jsCode": "const delay = ms => new Promise(resolve => setTimeout(resolve, ms));\nconst config = $('🎭 Apply Task Preset').first().json;\nconst rateLimit = config.rate_limit_ms || 2000;\n\nawait delay(rateLimit);\n\nconst modelData = $input.first().json;\nconsole.log(`\\n⏳ [PHASE 1] Quick test: ${modelData.model_id}`);\nconsole.log(`   Pre-score: ${modelData.scores.composite.toFixed(2)}/10`);\n\nreturn [{\n  json: {\n    ...modelData,\n    started_at: Date.now(),\n    test_results: {}\n  }\n}];"
       },
       "id": "init-phase1",
       "name": "🚀 Init Phase 1",
@@ -184,10 +178,6 @@
         "headerParameters": {
           "parameters": [
             {
-              "name": "Authorization",
-              "value": "={{ 'Bearer ' + $json.openrouter_api_key }}"
-            },
-            {
               "name": "Content-Type",
               "value": "application/json"
             }
@@ -198,7 +188,9 @@
         "jsonBody": "={\"model\":\"{{$json.model_id}}\",\"messages\":[{\"role\":\"user\",\"content\":\"Respond with exactly: 'OK'\"}],\"max_tokens\":5,\"temperature\":0.1}",
         "options": {
           "timeout": 20000
-        }
+        },
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
       },
       "id": "test1-availability",
       "name": "🧪 Test 1: Availability",
@@ -208,7 +200,13 @@
         480,
         528
       ],
-      "continueOnFail": true
+      "continueOnFail": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "openrouter-cred",
+          "name": "OpenRouter API Key"
+        }
+      }
     },
     {
       "parameters": {
@@ -281,10 +279,6 @@
         "headerParameters": {
           "parameters": [
             {
-              "name": "Authorization",
-              "value": "={{ 'Bearer ' + $json.openrouter_api_key }}"
-            },
-            {
               "name": "Content-Type",
               "value": "application/json"
             }
@@ -295,7 +289,9 @@
         "jsonBody": "={\"model\":\"{{$json.model_id}}\",\"messages\":[{\"role\":\"user\",\"content\":\"Analyze this Python code for security issues: `import os; password = \\\"admin123\\\"; os.system(f'echo {password}')`\"}],\"max_tokens\":300}",
         "options": {
           "timeout": 45000
-        }
+        },
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
       },
       "id": "test2",
       "name": "🛡️ Test 2: Security",
@@ -305,7 +301,13 @@
         1296,
         128
       ],
-      "continueOnFail": true
+      "continueOnFail": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "openrouter-cred",
+          "name": "OpenRouter API Key"
+        }
+      }
     },
     {
       "parameters": {
@@ -314,10 +316,6 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            {
-              "name": "Authorization",
-              "value": "={{ 'Bearer ' + $json.openrouter_api_key }}"
-            },
             {
               "name": "Content-Type",
               "value": "application/json"
@@ -329,7 +327,9 @@
         "jsonBody": "={\"model\":\"{{$json.model_id}}\",\"messages\":[{\"role\":\"user\",\"content\":\"Refactor with type hints and error handling: `def add(a, b): return a + b`\"}],\"max_tokens\":400}",
         "options": {
           "timeout": 45000
-        }
+        },
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
       },
       "id": "test3",
       "name": "✨ Test 3: Code Quality",
@@ -339,7 +339,13 @@
         1584,
         128
       ],
-      "continueOnFail": true
+      "continueOnFail": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "openrouter-cred",
+          "name": "OpenRouter API Key"
+        }
+      }
     },
     {
       "parameters": {
@@ -348,10 +354,6 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            {
-              "name": "Authorization",
-              "value": "={{ 'Bearer ' + $json.openrouter_api_key }}"
-            },
             {
               "name": "Content-Type",
               "value": "application/json"
@@ -363,7 +365,9 @@
         "jsonBody": "={\"model\":\"{{$json.model_id}}\",\"messages\":[{\"role\":\"user\",\"content\":\"A bat and ball cost $1.10 total. The bat costs $1.00 more than the ball. How much is the ball? Explain step-by-step.\"}],\"max_tokens\":500}",
         "options": {
           "timeout": 45000
-        }
+        },
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
       },
       "id": "test4",
       "name": "🧠 Test 4: Reasoning",
@@ -373,7 +377,13 @@
         1808,
         128
       ],
-      "continueOnFail": true
+      "continueOnFail": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "openrouter-cred",
+          "name": "OpenRouter API Key"
+        }
+      }
     },
     {
       "parameters": {
@@ -382,10 +392,6 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            {
-              "name": "Authorization",
-              "value": "={{ 'Bearer ' + $json.openrouter_api_key }}"
-            },
             {
               "name": "Content-Type",
               "value": "application/json"
@@ -397,7 +403,9 @@
         "jsonBody": "={\"model\":\"{{$json.model_id}}\",\"messages\":[{\"role\":\"user\",\"content\":\"Write a docstring for: `def process_data(data, *, threshold=0.5, normalize=True):`\"}],\"max_tokens\":400}",
         "options": {
           "timeout": 45000
-        }
+        },
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
       },
       "id": "test5",
       "name": "📚 Test 5: Documentation",
@@ -407,7 +415,13 @@
         2032,
         128
       ],
-      "continueOnFail": true
+      "continueOnFail": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "openrouter-cred",
+          "name": "OpenRouter API Key"
+        }
+      }
     },
     {
       "parameters": {
@@ -546,7 +560,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// 📋 BUILD MANUAL MODEL LIST\n// Пользователь задал список моделей вручную в ⚙️ Configuration → manual_models\n// Формируем объекты совместимые с форматом Phase 1\n\nconst config = $input.first().json;\nconst raw = config.manual_models || '';\nconst modelIds = raw.split(',').map(s => s.trim()).filter(Boolean);\n\nif (modelIds.length === 0) {\n  throw new Error('manual_models пуст! Добавьте ID моделей через запятую в настройках.');\n}\n\nconsole.log('\\n' + '='.repeat(80));\nconsole.log('📋 MANUAL MODE: Testing specific models only');\nconsole.log('='.repeat(80));\nconsole.log(`\\n🎯 Models to test (${modelIds.length}):`);\nmodelIds.forEach((id, i) => console.log(`  ${i+1}. ${id}`));\nconsole.log('\\n' + '='.repeat(80) + '\\n');\n\n// Создаём объекты в формате Phase 1 (нейтральные pre-scores)\nreturn modelIds.map(id => ({\n  json: {\n    model_id: id,\n    context_length: 0,\n    description: 'Manual selection',\n    pricing: {},\n    architecture: {},\n    modality: 'text->text',\n    scores: {\n      power: 5.0,\n      cost_efficiency: 5.0,\n      capability: 5.0,\n      compatibility: 5.0,\n      performance: 5.0,\n      composite: 5.0\n    },\n    skills: [],\n    avg_price: 0,\n    is_multimodal: false,\n    source: 'manual_selection',\n    manual_mode: true,\n    openrouter_api_key: config.openrouter_api_key\n  }\n}));"
+        "jsCode": "// 📋 BUILD MANUAL MODEL LIST\n// Пользователь задал список моделей вручную в ⚙️ Configuration → manual_models\n// Формируем объекты совместимые с форматом Phase 1\n\nconst config = $input.first().json;\nconst raw = config.manual_models || '';\nconst modelIds = raw.split(',').map(s => s.trim()).filter(Boolean);\n\nif (modelIds.length === 0) {\n  throw new Error('manual_models пуст! Добавьте ID моделей через запятую в настройках.');\n}\n\nconsole.log('\\n' + '='.repeat(80));\nconsole.log('📋 MANUAL MODE: Testing specific models only');\nconsole.log('='.repeat(80));\nconsole.log(`\\n🎯 Models to test (${modelIds.length}):`);\nmodelIds.forEach((id, i) => console.log(`  ${i+1}. ${id}`));\nconsole.log('\\n' + '='.repeat(80) + '\\n');\n\n// Создаём объекты в формате Phase 1 (нейтральные pre-scores)\nreturn modelIds.map(id => ({\n  json: {\n    model_id: id,\n    context_length: 0,\n    description: 'Manual selection',\n    pricing: {},\n    architecture: {},\n    modality: 'text->text',\n    scores: {\n      power: 5.0,\n      cost_efficiency: 5.0,\n      capability: 5.0,\n      compatibility: 5.0,\n      performance: 5.0,\n      composite: 5.0\n    },\n    skills: [],\n    avg_price: 0,\n    is_multimodal: false,\n    source: 'manual_selection',\n    manual_mode: true,\n  }\n}));"
       },
       "id": "manual-list-node",
       "name": "📋 Build Manual Model List",
