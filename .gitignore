@@ -10,9 +10,11 @@ QUICK_START_RU.md
 # Python виртуальное окружение
 .venv/
 
-# Сгенерированные отчёты
+# Сгенерированные отчёты (исключить из корня и рабочего стола)
 openrouter_report.html
 *.html
+# Но пример отчёта в Documentation — разрешить
+!Documentation/openrouter_report.html
 
 # Временные файлы
 *.py

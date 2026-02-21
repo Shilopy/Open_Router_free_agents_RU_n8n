@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>🤖 OpenRouter Model Report</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:#0f172a;color:#cbd5e1;min-height:100vh;padding:24px}
+  h1{font-size:28px;font-weight:800;color:#e2e8f0;margin-bottom:4px}
+  .sub{color:#64748b;font-size:14px;margin-bottom:24px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:28px}
+  .card{background:#1e293b;border-radius:12px;padding:20px;border:1px solid #334155}
+  .card-val{font-size:32px;font-weight:800;color:#818cf8;line-height:1}
+  .card-label{font-size:13px;color:#64748b;margin-top:6px}
+  .card-best{font-size:12px;color:#22c55e;margin-top:4px;word-break:break-all}
+  .section-title{font-size:16px;font-weight:700;color:#94a3b8;margin:28px 0 12px;letter-spacing:.5px;text-transform:uppercase}
+  .table-wrap{overflow-x:auto;border-radius:12px;border:1px solid #334155}
+  table{border-collapse:collapse;width:100%;background:#1e293b;font-size:13px}
+  th{background:#0f172a;color:#64748b;padding:10px 8px;text-align:left;font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #334155;white-space:nowrap}
+  tr:hover{background:#273449}
+  .pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600}
+  .pill-mode{background:#312e81;color:#818cf8}
+  .legend{display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap}
+  .leg-item{display:flex;align-items:center;gap:6px;font-size:12px;color:#64748b}
+  .leg-dot{width:12px;height:12px;border-radius:50%}
+  .footer{margin-top:32px;text-align:center;color:#334155;font-size:12px}
+  .top-model{background:linear-gradient(135deg,#1e293b,#1a1f3a);border:1px solid #4f46e5;border-radius:12px;padding:20px;margin-bottom:28px}
+  .top-model-title{font-size:12px;color:#818cf8;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+  .top-model-name{font-size:22px;font-weight:800;color:#e2e8f0;margin-bottom:12px;word-break:break-all}
+  .scores-inline{display:flex;gap:20px;flex-wrap:wrap}
+  .score-item{text-align:center}
+  .score-val{font-size:20px;font-weight:800}
+  .score-lbl{font-size:11px;color:#64748b;margin-top:2px}
+</style>
+</head>
+<body>
+<h1>🤖 OpenRouter Free Model Report</h1>
+<div class="sub">📅 21.02.2026, 21:57:19 &nbsp;|&nbsp; <span class="pill pill-mode">🌐 Universal — Сбалансированный выбор</span> &nbsp;|&nbsp; Проанализировано моделей: <b>29</b></div>
+
+<div class="grid">
+  <div class="card"><div class="card-val">29</div><div class="card-label">Финальных моделей</div></div>
+  <div class="card"><div class="card-val" style="color:#22c55e">7.08</div><div class="card-label">Средний финальный скор</div></div>
+  <div class="card"><div class="card-val" style="color:#f59e0b">10</div><div class="card-label">Прошли ≥4 из 5 тестов</div></div>
+  <div class="card"><div class="card-val" style="color:#94a3b8">968</div><div class="card-label">Среднее кол-во токенов</div></div>
+</div>
+
+<div class="top-model">
+  <div class="top-model-title">🏆 Лучшая модель</div>
+  <div class="top-model-name">qwen/qwen3-vl-30b-a3b-thinking</div>
+  <div class="scores-inline">
+    <div class="score-item"><div class="score-val" style="color:#818cf8">8.10</div><div class="score-lbl">Final Score</div></div>
+    <div class="score-item"><div class="score-val" style="color:#22c55e">7.75</div><div class="score-lbl">Pre-Score</div></div>
+    <div class="score-item"><div class="score-val" style="color:#f59e0b">10.00</div><div class="score-lbl">Quality</div></div>
+    <div class="score-item"><div class="score-val" style="color:#38bdf8">5.00</div><div class="score-lbl">Token Eff</div></div>
+    <div class="score-item"><div class="score-val" style="color:#a3e635">1/5</div><div class="score-lbl">Tests Passed</div></div>
+    <div class="score-item"><div class="score-val" style="color:#94a3b8">131k</div><div class="score-lbl">Context</div></div>
+  </div>
+</div>
+
+<div class="section-title">📊 Полная таблица моделей</div>
+<div class="legend">
+  <div class="leg-item"><div class="leg-dot" style="background:#22c55e"></div> Отлично (≥8.0)</div>
+  <div class="leg-item"><div class="leg-dot" style="background:#f59e0b"></div> Хорошо (6-8)</div>
+  <div class="leg-item"><div class="leg-dot" style="background:#f97316"></div> Средне (4-6)</div>
+  <div class="leg-item"><div class="leg-dot" style="background:#ef4444"></div> Слабо (&lt;4)</div>
+</div>
+<div class="table-wrap">
+<table>
+  <thead><tr>
+    <th>#</th>
+    <th>Модель / Навыки</th>
+    <th>Context</th>
+    <th>🏅 Final Score</th>
+    <th>📊 Pre-Score</th>
+    <th>🎯 Quality</th>
+    <th>⚡ Token Eff</th>
+    <th>✅ Test 1 Availability</th>
+    <th>🛡️ T2 Sec</th>
+    <th>✨ T3 Code</th>
+    <th>🧠 T4 Reason</th>
+    <th>📚 T5 Docs</th>
+    <th>Pass Rate</th>
+    <th>Tokens</th>
+  </tr></thead>
+  <tbody><tr style="border-bottom:1px solid #1e293b;">
+    <td style="padding:12px 8px;text-align:center;">🥇</td>
+    <td style="padding:12px 8px;">
+      <div style="font-weight:700;color:#e2e8f0;font-size:13px;">qwen/qwen3-vl-30b-a3b-thinking</div>
+      <div style="margin-top:4px;"><span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">reasoning</span> <span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">vision</span></div>
+    </td>
+    <td style="padding:12px 8px;text-align:center;"><span style="color:#818cf8">131k</span></td>
+    <td style="padding:12px 8px;min-width:120px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#22c55e;width:81.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#22c55e;font-weight:700">8.1</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:77.5%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.8</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#22c55e;width:100.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#22c55e;font-weight:700">10.0</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f97316;width:50.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f97316;font-weight:700">5.0</span></td>
+    <td style="padding:12px 8px;text-align:center;">✅ <span style="color:#64748b;font-size:11px">1957ms</span></td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">1/5</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">0</td>
+  </tr><tr style="border-bottom:1px solid #1e293b;">
+    <td style="padding:12px 8px;text-align:center;">🥈</td>
+    <td style="padding:12px 8px;">
+      <div style="font-weight:700;color:#e2e8f0;font-size:13px;">qwen/qwen3-vl-235b-a22b-thinking</div>
+      <div style="margin-top:4px;"><span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">reasoning</span> <span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">vision</span></div>
+    </td>
+    <td style="padding:12px 8px;text-align:center;"><span style="color:#818cf8">131k</span></td>
+    <td style="padding:12px 8px;min-width:120px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#22c55e;width:81.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#22c55e;font-weight:700">8.1</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:77.5%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.8</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#22c55e;width:100.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#22c55e;font-weight:700">10.0</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f97316;width:50.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f97316;font-weight:700">5.0</span></td>
+    <td style="padding:12px 8px;text-align:center;">✅ <span style="color:#64748b;font-size:11px">3019ms</span></td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">1/5</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">0</td>
+  </tr><tr style="border-bottom:1px solid #1e293b;">
+    <td style="padding:12px 8px;text-align:center;">🥉</td>
+    <td style="padding:12px 8px;">
+      <div style="font-weight:700;color:#e2e8f0;font-size:13px;">qwen/qwen3-vl-8b-instruct</div>
+      <div style="margin-top:4px;"><span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">chat</span> <span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">vision</span></div>
+    </td>
+    <td style="padding:12px 8px;text-align:center;"><span style="color:#818cf8">131k</span></td>
+    <td style="padding:12px 8px;min-width:120px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:79.2%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.9</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:73.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.3</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#22c55e;width:100.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#22c55e;font-weight:700">10.0</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f97316;width:50.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f97316;font-weight:700">5.0</span></td>
+    <td style="padding:12px 8px;text-align:center;">✅ <span style="color:#64748b;font-size:11px">743ms</span></td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">1/5</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">0</td>
+  </tr><tr style="border-bottom:1px solid #1e293b;">
+    <td style="padding:12px 8px;text-align:center;"><b style="color:#64748b">4</b></td>
+    <td style="padding:12px 8px;">
+      <div style="font-weight:700;color:#e2e8f0;font-size:13px;">qwen/qwen3-vl-30b-a3b-instruct</div>
+      <div style="margin-top:4px;"><span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">chat</span> <span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">vision</span></div>
+    </td>
+    <td style="padding:12px 8px;text-align:center;"><span style="color:#818cf8">131k</span></td>
+    <td style="padding:12px 8px;min-width:120px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:79.2%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.9</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:73.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.3</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#22c55e;width:100.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#22c55e;font-weight:700">10.0</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f97316;width:50.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f97316;font-weight:700">5.0</span></td>
+    <td style="padding:12px 8px;text-align:center;">✅ <span style="color:#64748b;font-size:11px">1895ms</span></td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">1/5</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">0</td>
+  </tr><tr style="border-bottom:1px solid #1e293b;">
+    <td style="padding:12px 8px;text-align:center;"><b style="color:#64748b">5</b></td>
+    <td style="padding:12px 8px;">
+      <div style="font-weight:700;color:#e2e8f0;font-size:13px;">mistralai/mistral-small-3.2-24b-instruct</div>
+      <div style="margin-top:4px;"><span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">chat</span> <span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">vision</span></div>
+    </td>
+    <td style="padding:12px 8px;text-align:center;"><span style="color:#818cf8">131k</span></td>
+    <td style="padding:12px 8px;min-width:120px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:79.2%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.9</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:73.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.3</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#22c55e;width:100.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#22c55e;font-weight:700">10.0</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f97316;width:50.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f97316;font-weight:700">5.0</span></td>
+    <td style="padding:12px 8px;text-align:center;">✅ <span style="color:#64748b;font-size:11px">947ms</span></td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">1/5</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">0</td>
+  </tr><tr style="border-bottom:1px solid #1e293b;">
+    <td style="padding:12px 8px;text-align:center;"><b style="color:#64748b">6</b></td>
+    <td style="padding:12px 8px;">
+      <div style="font-weight:700;color:#e2e8f0;font-size:13px;">qwen/qwen2.5-vl-32b-instruct</div>
+      <div style="margin-top:4px;"><span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">chat</span> <span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">vision</span></div>
+    </td>
+    <td style="padding:12px 8px;text-align:center;"><span style="color:#818cf8">128k</span></td>
+    <td style="padding:12px 8px;min-width:120px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:79.2%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.9</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:73.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.3</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#22c55e;width:100.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#22c55e;font-weight:700">10.0</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f97316;width:50.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f97316;font-weight:700">5.0</span></td>
+    <td style="padding:12px 8px;text-align:center;">✅ <span style="color:#64748b;font-size:11px">702ms</span></td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">1/5</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">0</td>
+  </tr><tr style="border-bottom:1px solid #1e293b;">
+    <td style="padding:12px 8px;text-align:center;"><b style="color:#64748b">7</b></td>
+    <td style="padding:12px 8px;">
+      <div style="font-weight:700;color:#e2e8f0;font-size:13px;">mistralai/mistral-small-3.1-24b-instruct</div>
+      <div style="margin-top:4px;"><span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">chat</span> <span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">vision</span></div>
+    </td>
+    <td style="padding:12px 8px;text-align:center;"><span style="color:#818cf8">128k</span></td>
+    <td style="padding:12px 8px;min-width:120px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:79.2%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.9</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:73.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.3</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#22c55e;width:100.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#22c55e;font-weight:700">10.0</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f97316;width:50.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f97316;font-weight:700">5.0</span></td>
+    <td style="padding:12px 8px;text-align:center;">✅ <span style="color:#64748b;font-size:11px">847ms</span></td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">1/5</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">0</td>
+  </tr><tr style="border-bottom:1px solid #1e293b;">
+    <td style="padding:12px 8px;text-align:center;"><b style="color:#64748b">8</b></td>
+    <td style="padding:12px 8px;">
+      <div style="font-weight:700;color:#e2e8f0;font-size:13px;">openrouter/auto</div>
+      <div style="margin-top:4px;"><span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">vision</span></div>
+    </td>
+    <td style="padding:12px 8px;text-align:center;"><span style="color:#818cf8">2000k</span></td>
+    <td style="padding:12px 8px;min-width:120px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:79.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.9</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:72.5%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.3</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#22c55e;width:100.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#22c55e;font-weight:700">10.0</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f97316;width:50.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f97316;font-weight:700">5.0</span></td>
+    <td style="padding:12px 8px;text-align:center;">✅ <span style="color:#64748b;font-size:11px">1922ms</span></td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">1/5</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">0</td>
+  </tr><tr style="border-bottom:1px solid #1e293b;">
+    <td style="padding:12px 8px;text-align:center;"><b style="color:#64748b">9</b></td>
+    <td style="padding:12px 8px;">
+      <div style="font-weight:700;color:#e2e8f0;font-size:13px;">mistralai/mistral-large-2512</div>
+      <div style="margin-top:4px;"><span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">vision</span></div>
+    </td>
+    <td style="padding:12px 8px;text-align:center;"><span style="color:#818cf8">262k</span></td>
+    <td style="padding:12px 8px;min-width:120px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:78.8%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.9</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:72.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.2</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#22c55e;width:100.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#22c55e;font-weight:700">10.0</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f97316;width:50.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f97316;font-weight:700">5.0</span></td>
+    <td style="padding:12px 8px;text-align:center;">✅ <span style="color:#64748b;font-size:11px">752ms</span></td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">1/5</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">0</td>
+  </tr><tr style="border-bottom:1px solid #1e293b;">
+    <td style="padding:12px 8px;text-align:center;"><b style="color:#64748b">10</b></td>
+    <td style="padding:12px 8px;">
+      <div style="font-weight:700;color:#e2e8f0;font-size:13px;">openrouter/free</div>
+      <div style="margin-top:4px;"><span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">vision</span></div>
+    </td>
+    <td style="padding:12px 8px;text-align:center;"><span style="color:#818cf8">200k</span></td>
+    <td style="padding:12px 8px;min-width:120px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:78.6%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.9</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:71.5%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.2</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#22c55e;width:100.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#22c55e;font-weight:700">10.0</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f97316;width:50.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f97316;font-weight:700">5.0</span></td>
+    <td style="padding:12px 8px;text-align:center;">✅ <span style="color:#64748b;font-size:11px">3277ms</span></td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">1/5</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">0</td>
+  </tr><tr style="border-bottom:1px solid #1e293b;">
+    <td style="padding:12px 8px;text-align:center;"><b style="color:#64748b">11</b></td>
+    <td style="padding:12px 8px;">
+      <div style="font-weight:700;color:#e2e8f0;font-size:13px;">google/gemini-2.5-flash-lite-preview-09-2025</div>
+      <div style="margin-top:4px;"><span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">vision</span></div>
+    </td>
+    <td style="padding:12px 8px;text-align:center;"><span style="color:#818cf8">1049k</span></td>
+    <td style="padding:12px 8px;min-width:120px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:78.6%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.9</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:71.5%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.2</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#22c55e;width:100.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#22c55e;font-weight:700">10.0</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f97316;width:50.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f97316;font-weight:700">5.0</span></td>
+    <td style="padding:12px 8px;text-align:center;">✅ <span style="color:#64748b;font-size:11px">591ms</span></td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">1/5</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">0</td>
+  </tr><tr style="border-bottom:1px solid #1e293b;">
+    <td style="padding:12px 8px;text-align:center;"><b style="color:#64748b">12</b></td>
+    <td style="padding:12px 8px;">
+      <div style="font-weight:700;color:#e2e8f0;font-size:13px;">mistralai/ministral-14b-2512</div>
+      <div style="margin-top:4px;"><span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">vision</span></div>
+    </td>
+    <td style="padding:12px 8px;text-align:center;"><span style="color:#818cf8">262k</span></td>
+    <td style="padding:12px 8px;min-width:120px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:78.4%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.8</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:71.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.1</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#22c55e;width:100.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#22c55e;font-weight:700">10.0</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f97316;width:50.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f97316;font-weight:700">5.0</span></td>
+    <td style="padding:12px 8px;text-align:center;">✅ <span style="color:#64748b;font-size:11px">570ms</span></td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">1/5</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">0</td>
+  </tr><tr style="border-bottom:1px solid #1e293b;">
+    <td style="padding:12px 8px;text-align:center;"><b style="color:#64748b">13</b></td>
+    <td style="padding:12px 8px;">
+      <div style="font-weight:700;color:#e2e8f0;font-size:13px;">mistralai/ministral-8b-2512</div>
+      <div style="margin-top:4px;"><span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">vision</span></div>
+    </td>
+    <td style="padding:12px 8px;text-align:center;"><span style="color:#818cf8">262k</span></td>
+    <td style="padding:12px 8px;min-width:120px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:78.4%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.8</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:71.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.1</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#22c55e;width:100.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#22c55e;font-weight:700">10.0</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f97316;width:50.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f97316;font-weight:700">5.0</span></td>
+    <td style="padding:12px 8px;text-align:center;">✅ <span style="color:#64748b;font-size:11px">667ms</span></td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">1/5</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">0</td>
+  </tr><tr style="border-bottom:1px solid #1e293b;">
+    <td style="padding:12px 8px;text-align:center;"><b style="color:#64748b">14</b></td>
+    <td style="padding:12px 8px;">
+      <div style="font-weight:700;color:#e2e8f0;font-size:13px;">meta-llama/llama-4-maverick</div>
+      <div style="margin-top:4px;"><span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">vision</span></div>
+    </td>
+    <td style="padding:12px 8px;text-align:center;"><span style="color:#818cf8">1049k</span></td>
+    <td style="padding:12px 8px;min-width:120px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:78.4%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.8</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:71.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.1</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#22c55e;width:100.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#22c55e;font-weight:700">10.0</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f97316;width:50.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f97316;font-weight:700">5.0</span></td>
+    <td style="padding:12px 8px;text-align:center;">✅ <span style="color:#64748b;font-size:11px">813ms</span></td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">1/5</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">0</td>
+  </tr><tr style="border-bottom:1px solid #1e293b;">
+    <td style="padding:12px 8px;text-align:center;"><b style="color:#64748b">15</b></td>
+    <td style="padding:12px 8px;">
+      <div style="font-weight:700;color:#e2e8f0;font-size:13px;">meta-llama/llama-4-scout</div>
+      <div style="margin-top:4px;"><span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">vision</span></div>
+    </td>
+    <td style="padding:12px 8px;text-align:center;"><span style="color:#818cf8">328k</span></td>
+    <td style="padding:12px 8px;min-width:120px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:78.4%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.8</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:71.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.1</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#22c55e;width:100.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#22c55e;font-weight:700">10.0</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f97316;width:50.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f97316;font-weight:700">5.0</span></td>
+    <td style="padding:12px 8px;text-align:center;">✅ <span style="color:#64748b;font-size:11px">779ms</span></td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">1/5</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">0</td>
+  </tr><tr style="border-bottom:1px solid #1e293b;">
+    <td style="padding:12px 8px;text-align:center;"><b style="color:#64748b">16</b></td>
+    <td style="padding:12px 8px;">
+      <div style="font-weight:700;color:#e2e8f0;font-size:13px;">meta-llama/llama-3.3-70b-instruct</div>
+      <div style="margin-top:4px;"><span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">chat</span></div>
+    </td>
+    <td style="padding:12px 8px;text-align:center;"><span style="color:#818cf8">131k</span></td>
+    <td style="padding:12px 8px;min-width:120px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:78.2%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.8</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:70.5%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.0</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#22c55e;width:100.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#22c55e;font-weight:700">10.0</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f97316;width:50.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f97316;font-weight:700">5.0</span></td>
+    <td style="padding:12px 8px;text-align:center;">✅ <span style="color:#64748b;font-size:11px">1676ms</span></td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">1/5</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">0</td>
+  </tr><tr style="border-bottom:1px solid #1e293b;">
+    <td style="padding:12px 8px;text-align:center;"><b style="color:#64748b">17</b></td>
+    <td style="padding:12px 8px;">
+      <div style="font-weight:700;color:#e2e8f0;font-size:13px;">meta-llama/llama-3.1-70b-instruct</div>
+      <div style="margin-top:4px;"><span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">chat</span></div>
+    </td>
+    <td style="padding:12px 8px;text-align:center;"><span style="color:#818cf8">131k</span></td>
+    <td style="padding:12px 8px;min-width:120px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:78.2%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.8</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:70.5%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.0</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#22c55e;width:100.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#22c55e;font-weight:700">10.0</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f97316;width:50.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f97316;font-weight:700">5.0</span></td>
+    <td style="padding:12px 8px;text-align:center;">✅ <span style="color:#64748b;font-size:11px">929ms</span></td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">1/5</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">0</td>
+  </tr><tr style="border-bottom:1px solid #1e293b;">
+    <td style="padding:12px 8px;text-align:center;"><b style="color:#64748b">18</b></td>
+    <td style="padding:12px 8px;">
+      <div style="font-weight:700;color:#e2e8f0;font-size:13px;">qwen/qwen3-vl-235b-a22b-thinking</div>
+      <div style="margin-top:4px;"><span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">reasoning</span> <span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">vision</span></div>
+    </td>
+    <td style="padding:12px 8px;text-align:center;"><span style="color:#818cf8">131k</span></td>
+    <td style="padding:12px 8px;min-width:120px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:62.2%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">6.2</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:77.5%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.8</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:78.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.8</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#ef4444;width:0.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#ef4444;font-weight:700">0.0</span></td>
+    <td style="padding:12px 8px;text-align:center;">✅ <span style="color:#64748b;font-size:11px">3019ms</span></td>
+    <td style="padding:12px 8px;text-align:center;">✅</td>
+    <td style="padding:12px 8px;text-align:center;">✅</td>
+    <td style="padding:12px 8px;text-align:center;">✅</td>
+    <td style="padding:12px 8px;text-align:center;">✅</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">5/5</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">6042</td>
+  </tr><tr style="border-bottom:1px solid #1e293b;">
+    <td style="padding:12px 8px;text-align:center;"><b style="color:#64748b">19</b></td>
+    <td style="padding:12px 8px;">
+      <div style="font-weight:700;color:#e2e8f0;font-size:13px;">qwen/qwen3-vl-235b-a22b-instruct</div>
+      <div style="margin-top:4px;"><span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">chat</span> <span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">vision</span></div>
+    </td>
+    <td style="padding:12px 8px;text-align:center;"><span style="color:#818cf8">262k</span></td>
+    <td style="padding:12px 8px;min-width:120px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:60.8%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">6.1</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:74.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.4</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:78.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.8</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#ef4444;width:0.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#ef4444;font-weight:700">0.0</span></td>
+    <td style="padding:12px 8px;text-align:center;">✅ <span style="color:#64748b;font-size:11px">975ms</span></td>
+    <td style="padding:12px 8px;text-align:center;">✅</td>
+    <td style="padding:12px 8px;text-align:center;">✅</td>
+    <td style="padding:12px 8px;text-align:center;">✅</td>
+    <td style="padding:12px 8px;text-align:center;">✅</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">5/5</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">1632</td>
+  </tr><tr style="border-bottom:1px solid #1e293b;">
+    <td style="padding:12px 8px;text-align:center;"><b style="color:#64748b">20</b></td>
+    <td style="padding:12px 8px;">
+      <div style="font-weight:700;color:#e2e8f0;font-size:13px;">qwen/qwen2.5-vl-32b-instruct</div>
+      <div style="margin-top:4px;"><span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">chat</span> <span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">vision</span></div>
+    </td>
+    <td style="padding:12px 8px;text-align:center;"><span style="color:#818cf8">128k</span></td>
+    <td style="padding:12px 8px;min-width:120px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:60.4%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">6.0</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:73.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.3</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:78.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.8</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#ef4444;width:0.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#ef4444;font-weight:700">0.0</span></td>
+    <td style="padding:12px 8px;text-align:center;">✅ <span style="color:#64748b;font-size:11px">702ms</span></td>
+    <td style="padding:12px 8px;text-align:center;">✅</td>
+    <td style="padding:12px 8px;text-align:center;">✅</td>
+    <td style="padding:12px 8px;text-align:center;">✅</td>
+    <td style="padding:12px 8px;text-align:center;">✅</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">5/5</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">1619</td>
+  </tr><tr style="border-bottom:1px solid #1e293b;">
+    <td style="padding:12px 8px;text-align:center;"><b style="color:#64748b">21</b></td>
+    <td style="padding:12px 8px;">
+      <div style="font-weight:700;color:#e2e8f0;font-size:13px;">qwen/qwen3-vl-8b-instruct</div>
+      <div style="margin-top:4px;"><span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">chat</span> <span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">vision</span></div>
+    </td>
+    <td style="padding:12px 8px;text-align:center;"><span style="color:#818cf8">131k</span></td>
+    <td style="padding:12px 8px;min-width:120px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:60.4%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">6.0</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:73.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.3</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:78.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.8</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#ef4444;width:0.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#ef4444;font-weight:700">0.0</span></td>
+    <td style="padding:12px 8px;text-align:center;">✅ <span style="color:#64748b;font-size:11px">743ms</span></td>
+    <td style="padding:12px 8px;text-align:center;">✅</td>
+    <td style="padding:12px 8px;text-align:center;">✅</td>
+    <td style="padding:12px 8px;text-align:center;">✅</td>
+    <td style="padding:12px 8px;text-align:center;">✅</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">5/5</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">1582</td>
+  </tr><tr style="border-bottom:1px solid #1e293b;">
+    <td style="padding:12px 8px;text-align:center;"><b style="color:#64748b">22</b></td>
+    <td style="padding:12px 8px;">
+      <div style="font-weight:700;color:#e2e8f0;font-size:13px;">mistralai/mistral-small-3.2-24b-instruct</div>
+      <div style="margin-top:4px;"><span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">chat</span> <span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">vision</span></div>
+    </td>
+    <td style="padding:12px 8px;text-align:center;"><span style="color:#818cf8">131k</span></td>
+    <td style="padding:12px 8px;min-width:120px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:60.4%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">6.0</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:73.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.3</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:78.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.8</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#ef4444;width:0.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#ef4444;font-weight:700">0.0</span></td>
+    <td style="padding:12px 8px;text-align:center;">✅ <span style="color:#64748b;font-size:11px">947ms</span></td>
+    <td style="padding:12px 8px;text-align:center;">✅</td>
+    <td style="padding:12px 8px;text-align:center;">✅</td>
+    <td style="padding:12px 8px;text-align:center;">✅</td>
+    <td style="padding:12px 8px;text-align:center;">✅</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">5/5</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">1602</td>
+  </tr><tr style="border-bottom:1px solid #1e293b;">
+    <td style="padding:12px 8px;text-align:center;"><b style="color:#64748b">23</b></td>
+    <td style="padding:12px 8px;">
+      <div style="font-weight:700;color:#e2e8f0;font-size:13px;">qwen/qwen3-vl-32b-instruct</div>
+      <div style="margin-top:4px;"><span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">chat</span> <span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">vision</span></div>
+    </td>
+    <td style="padding:12px 8px;text-align:center;"><span style="color:#818cf8">131k</span></td>
+    <td style="padding:12px 8px;min-width:120px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:60.4%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">6.0</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:73.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.3</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:78.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.8</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#ef4444;width:0.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#ef4444;font-weight:700">0.0</span></td>
+    <td style="padding:12px 8px;text-align:center;">✅ <span style="color:#64748b;font-size:11px">1265ms</span></td>
+    <td style="padding:12px 8px;text-align:center;">✅</td>
+    <td style="padding:12px 8px;text-align:center;">✅</td>
+    <td style="padding:12px 8px;text-align:center;">✅</td>
+    <td style="padding:12px 8px;text-align:center;">✅</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">5/5</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">1676</td>
+  </tr><tr style="border-bottom:1px solid #1e293b;">
+    <td style="padding:12px 8px;text-align:center;"><b style="color:#64748b">24</b></td>
+    <td style="padding:12px 8px;">
+      <div style="font-weight:700;color:#e2e8f0;font-size:13px;">mistralai/mistral-large-2512</div>
+      <div style="margin-top:4px;"><span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">vision</span></div>
+    </td>
+    <td style="padding:12px 8px;text-align:center;"><span style="color:#818cf8">262k</span></td>
+    <td style="padding:12px 8px;min-width:120px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:60.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">6.0</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:72.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.2</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:78.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.8</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#ef4444;width:0.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#ef4444;font-weight:700">0.0</span></td>
+    <td style="padding:12px 8px;text-align:center;">✅ <span style="color:#64748b;font-size:11px">752ms</span></td>
+    <td style="padding:12px 8px;text-align:center;">✅</td>
+    <td style="padding:12px 8px;text-align:center;">✅</td>
+    <td style="padding:12px 8px;text-align:center;">✅</td>
+    <td style="padding:12px 8px;text-align:center;">✅</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">5/5</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">1431</td>
+  </tr><tr style="border-bottom:1px solid #1e293b;">
+    <td style="padding:12px 8px;text-align:center;"><b style="color:#64748b">25</b></td>
+    <td style="padding:12px 8px;">
+      <div style="font-weight:700;color:#e2e8f0;font-size:13px;">qwen/qwen3-vl-30b-a3b-thinking</div>
+      <div style="margin-top:4px;"><span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">reasoning</span> <span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">vision</span></div>
+    </td>
+    <td style="padding:12px 8px;text-align:center;"><span style="color:#818cf8">131k</span></td>
+    <td style="padding:12px 8px;min-width:120px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f97316;width:59.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f97316;font-weight:700">5.9</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:77.5%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.8</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:70.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.0</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#ef4444;width:0.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#ef4444;font-weight:700">0.0</span></td>
+    <td style="padding:12px 8px;text-align:center;">✅ <span style="color:#64748b;font-size:11px">1957ms</span></td>
+    <td style="padding:12px 8px;text-align:center;">✅</td>
+    <td style="padding:12px 8px;text-align:center;">✅</td>
+    <td style="padding:12px 8px;text-align:center;">✅</td>
+    <td style="padding:12px 8px;text-align:center;">✅</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">5/5</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">9421</td>
+  </tr><tr style="border-bottom:1px solid #1e293b;">
+    <td style="padding:12px 8px;text-align:center;"><b style="color:#64748b">26</b></td>
+    <td style="padding:12px 8px;">
+      <div style="font-weight:700;color:#e2e8f0;font-size:13px;">qwen/qwen3.5-397b-a17b</div>
+      <div style="margin-top:4px;"><span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">vision</span></div>
+    </td>
+    <td style="padding:12px 8px;text-align:center;"><span style="color:#818cf8">262k</span></td>
+    <td style="padding:12px 8px;min-width:120px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f97316;width:58.8%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f97316;font-weight:700">5.9</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:72.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.2</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f97316;width:50.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f97316;font-weight:700">5.0</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f97316;width:50.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f97316;font-weight:700">5.0</span></td>
+    <td style="padding:12px 8px;text-align:center;">✅ <span style="color:#64748b;font-size:11px">1019ms</span></td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">1/5</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">0</td>
+  </tr><tr style="border-bottom:1px solid #1e293b;">
+    <td style="padding:12px 8px;text-align:center;"><b style="color:#64748b">27</b></td>
+    <td style="padding:12px 8px;">
+      <div style="font-weight:700;color:#e2e8f0;font-size:13px;">nvidia/nemotron-nano-12b-v2-vl</div>
+      <div style="margin-top:4px;"><span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">vision</span></div>
+    </td>
+    <td style="padding:12px 8px;text-align:center;"><span style="color:#818cf8">131k</span></td>
+    <td style="padding:12px 8px;min-width:120px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f97316;width:58.4%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f97316;font-weight:700">5.8</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:71.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.1</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f97316;width:50.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f97316;font-weight:700">5.0</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f97316;width:50.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f97316;font-weight:700">5.0</span></td>
+    <td style="padding:12px 8px;text-align:center;">✅ <span style="color:#64748b;font-size:11px">1353ms</span></td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;">❌</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">1/5</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">0</td>
+  </tr><tr style="border-bottom:1px solid #1e293b;">
+    <td style="padding:12px 8px;text-align:center;"><b style="color:#64748b">28</b></td>
+    <td style="padding:12px 8px;">
+      <div style="font-weight:700;color:#e2e8f0;font-size:13px;">mistralai/mistral-small-3.1-24b-instruct</div>
+      <div style="margin-top:4px;"><span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">chat</span> <span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">vision</span></div>
+    </td>
+    <td style="padding:12px 8px;text-align:center;"><span style="color:#818cf8">128k</span></td>
+    <td style="padding:12px 8px;min-width:120px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f97316;width:57.2%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f97316;font-weight:700">5.7</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:73.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.3</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:70.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.0</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#ef4444;width:0.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#ef4444;font-weight:700">0.0</span></td>
+    <td style="padding:12px 8px;text-align:center;">✅ <span style="color:#64748b;font-size:11px">847ms</span></td>
+    <td style="padding:12px 8px;text-align:center;">✅</td>
+    <td style="padding:12px 8px;text-align:center;">✅</td>
+    <td style="padding:12px 8px;text-align:center;">✅</td>
+    <td style="padding:12px 8px;text-align:center;">✅</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">5/5</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">1315</td>
+  </tr><tr style="border-bottom:1px solid #1e293b;">
+    <td style="padding:12px 8px;text-align:center;"><b style="color:#64748b">29</b></td>
+    <td style="padding:12px 8px;">
+      <div style="font-weight:700;color:#e2e8f0;font-size:13px;">nvidia/nemotron-nano-12b-v2-vl:free</div>
+      <div style="margin-top:4px;"><span style="background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;">vision</span></div>
+    </td>
+    <td style="padding:12px 8px;text-align:center;"><span style="color:#818cf8">128k</span></td>
+    <td style="padding:12px 8px;min-width:120px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f97316;width:52.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f97316;font-weight:700">5.2</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f59e0b;width:76.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f59e0b;font-weight:700">7.6</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#f97316;width:54.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#f97316;font-weight:700">5.4</span></td>
+    <td style="padding:12px 8px;min-width:100px;"><div style="background:#1e293b;border-radius:4px;height:10px;width:100%;"><div style="background:#ef4444;width:0.0%;height:10px;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;color:#ef4444;font-weight:700">0.0</span></td>
+    <td style="padding:12px 8px;text-align:center;">✅ <span style="color:#64748b;font-size:11px">1171ms</span></td>
+    <td style="padding:12px 8px;text-align:center;">✅</td>
+    <td style="padding:12px 8px;text-align:center;">✅</td>
+    <td style="padding:12px 8px;text-align:center;">✅</td>
+    <td style="padding:12px 8px;text-align:center;">✅</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">5/5</td>
+    <td style="padding:12px 8px;text-align:center;color:#64748b;font-size:12px;">1759</td>
+  </tr></tbody>
+</table>
+</div>
+<div class="footer">Generated by OpenRouter Advanced THREE PHASE Workflow &mdash; 21.02.2026, 21:57:19</div>
+</body></html>

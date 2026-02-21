@@ -84,6 +84,8 @@ deepseek/deepseek-chat,meta-llama/llama-3.1-70b-instruct:free
 - **`openrouter_report.html`** — HTML-дашборд сохраняется на Рабочий стол
 - **JSON** — экспорт через встроенный N8N Convert to File
 
+👉 **Пример готового отчёта:** [Documentation/openrouter_report.html](Documentation/openrouter_report.html)
+
 ## 🇷🇺 Оптимизация для России
 
 Phase 0 автоматически учитывает:
