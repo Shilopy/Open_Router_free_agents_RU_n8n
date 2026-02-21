@@ -1,0 +1,20 @@
+# Старые версии воркфлоу — не публиковать
+OpenRouter_Free_Experts_RU.json
+OpenRouter_Free_Experts_RU_FIXED.json
+OpenRouter_Free_Experts_RU_TWO_PHASE.json
+
+# Вспомогательные и черновые файлы
+ADVANCED_SCORING_GUIDE.md
+QUICK_START_RU.md
+
+# Python виртуальное окружение
+.venv/
+
+# Сгенерированные отчёты
+openrouter_report.html
+*.html
+
+# Временные файлы
+*.py
+*.ps1
+__pycache__/

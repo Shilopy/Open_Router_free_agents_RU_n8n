@@ -1,0 +1,915 @@
+{
+  "name": "OpenRouter_Advanced_THREE_PHASE",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "start-node",
+      "name": "▶️ Start Workflow",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -384,
+        -208
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "api-key",
+              "name": "openrouter_api_key",
+              "value": "YOUR_OPENROUTER_API_KEY_HERE",
+              "type": "string"
+            },
+            {
+              "id": "test-mode",
+              "name": "test_mode",
+              "value": "auto",
+              "type": "string"
+            },
+            {
+              "id": "rate-limit",
+              "name": "rate_limit_ms",
+              "value": "2000",
+              "type": "number"
+            },
+            {
+              "id": "phase0-max",
+              "name": "phase0_max_models",
+              "value": "30",
+              "type": "number"
+            },
+            {
+              "id": "phase1-max",
+              "name": "phase1_max_models",
+              "value": "15",
+              "type": "number"
+            },
+            {
+              "id": "phase2-max",
+              "name": "phase2_max_models",
+              "value": "10",
+              "type": "number"
+            },
+            {
+              "id": "scoring-weights",
+              "name": "scoring_weights",
+              "value": "{\"power\":0.3,\"cost_efficiency\":0.2,\"capability\":0.25,\"compatibility\":0.15,\"performance\":0.1}",
+              "type": "string"
+            },
+            {
+              "id": "min-context",
+              "name": "min_context_length",
+              "value": "32000",
+              "type": "number"
+            },
+            {
+              "id": "max-price-prompt",
+              "name": "max_price_prompt",
+              "value": "0.000002",
+              "type": "number"
+            },
+            {
+              "id": "max-price-completion",
+              "name": "max_price_completion",
+              "value": "0.000004",
+              "type": "number"
+            },
+            {
+              "id": "prefer-skills",
+              "name": "preferred_skills",
+              "value": "code,reasoning,chat",
+              "type": "string"
+            },
+            {
+              "id": "task-mode",
+              "name": "task_mode",
+              "value": "universal",
+              "type": "string",
+              "description": "Выберите режим: universal | coding | reasoning | chatbot | economy | power | speed"
+            },
+            {
+              "id": "manual-models",
+              "name": "manual_models",
+              "value": "",
+              "type": "string",
+              "description": "Список моделей через запятую. Если задан — тестируются только они. Пример: deepseek/deepseek-r1-distill-llama-70b,qwen/qwen-2.5-72b-instruct:free"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "config-node",
+      "name": "⚙️ Configuration",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -320,
+        256
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// 🎭 TASK PRESET SELECTOR\n// Пользователь выбирает режим в ⚙️ Configuration → task_mode\n// Доступные режимы: universal | coding | reasoning | chatbot | economy | power | speed\n\nconst config = $input.first().json;\nconst taskMode = (config.task_mode || 'universal').toLowerCase().trim();\n\n// ─── ПРЕСЕТЫ ─────────────────────────────────────────────────────────────────\nconst PRESETS = {\n\n  // 🌐 UNIVERSAL: Сбалансированный выбор (по умолчанию)\n  universal: {\n    label: '🌐 Universal — Сбалансированный выбор',\n    preferred_skills: 'code,reasoning,chat',\n    min_context_length: 32000,\n    phase0_max_models: 30,\n    phase2_max_models: 10,\n    max_price_prompt: 0.000002,\n    max_price_completion: 0.000004,\n    scoring_weights: { power: 0.30, cost_efficiency: 0.20, capability: 0.25, compatibility: 0.15, performance: 0.10 }\n  },\n\n  // 💻 CODING: Лучшие модели для разработки и кода\n  coding: {\n    label: '💻 Coding — Лучшие для программирования',\n    preferred_skills: 'code',\n    min_context_length: 64000,\n    phase0_max_models: 25,\n    phase2_max_models: 8,\n    max_price_prompt: 0.000002,\n    max_price_completion: 0.000004,\n    scoring_weights: { power: 0.20, cost_efficiency: 0.10, capability: 0.50, compatibility: 0.15, performance: 0.05 }\n  },\n\n  // 🧠 REASONING: Логика, математика, сложный анализ\n  reasoning: {\n    label: '🧠 Reasoning — Логика и сложные задачи',\n    preferred_skills: 'reasoning,think',\n    min_context_length: 64000,\n    phase0_max_models: 20,\n    phase2_max_models: 8,\n    max_price_prompt: 0.000002,\n    max_price_completion: 0.000004,\n    scoring_weights: { power: 0.45, cost_efficiency: 0.05, capability: 0.35, compatibility: 0.10, performance: 0.05 }\n  },\n\n  // 💬 CHATBOT: Быстрый и естественный диалог\n  chatbot: {\n    label: '💬 Chatbot — Быстрый разговорный ИИ',\n    preferred_skills: 'chat,instruct',\n    min_context_length: 16000,\n    phase0_max_models: 35,\n    phase2_max_models: 10,\n    max_price_prompt: 0.000002,\n    max_price_completion: 0.000004,\n    scoring_weights: { power: 0.10, cost_efficiency: 0.20, capability: 0.30, compatibility: 0.15, performance: 0.25 }\n  },\n\n  // 💰 ECONOMY: Минимальные токены, только бесплатные\n  economy: {\n    label: '💰 Economy — Максимальная экономия токенов',\n    preferred_skills: 'chat,code',\n    min_context_length: 16000,\n    phase0_max_models: 20,\n    phase2_max_models: 5,\n    max_price_prompt: 0.0000005,\n    max_price_completion: 0.000001,\n    scoring_weights: { power: 0.15, cost_efficiency: 0.55, capability: 0.15, compatibility: 0.10, performance: 0.05 }\n  },\n\n  // ⚡ POWER: Максимальная мощность и большой контекст\n  power: {\n    label: '⚡ Power — Максимальная мощность моделей',\n    preferred_skills: 'reasoning,code',\n    min_context_length: 128000,\n    phase0_max_models: 20,\n    phase2_max_models: 8,\n    max_price_prompt: 0.000002,\n    max_price_completion: 0.000004,\n    scoring_weights: { power: 0.50, cost_efficiency: 0.10, capability: 0.25, compatibility: 0.10, performance: 0.05 }\n  },\n\n  // 🚀 SPEED: Минимальная задержка, быстрые ответы\n  speed: {\n    label: '🚀 Speed — Самые быстрые модели',\n    preferred_skills: 'chat,instruct',\n    min_context_length: 16000,\n    phase0_max_models: 30,\n    phase2_max_models: 8,\n    max_price_prompt: 0.000002,\n    max_price_completion: 0.000004,\n    scoring_weights: { power: 0.10, cost_efficiency: 0.15, capability: 0.20, compatibility: 0.15, performance: 0.40 }\n  }\n};\n\n// ─── ПРИМЕНЕНИЕ ПРЕСЕТА ──────────────────────────────────────────────────────\nconst preset = PRESETS[taskMode] || PRESETS['universal'];\nconst isUnknown = !PRESETS[taskMode];\n\nconsole.log('\\n' + '='.repeat(100));\nconsole.log('🎭 TASK PRESET SELECTOR');\nconsole.log('='.repeat(100));\n\nif (isUnknown) {\n  console.log(`⚠️  Unknown task_mode: '${taskMode}'. Falling back to 'universal'.`);\n  console.log(`   Available: ${Object.keys(PRESETS).join(' | ')}`);\n} else {\n  console.log(`✅ Task Mode: ${preset.label}`);\n}\n\nconsole.log('\\n📋 Applied Settings:');\nconsole.log(`   Preferred Skills : ${preset.preferred_skills}`);\nconsole.log(`   Min Context      : ${preset.min_context_length.toLocaleString()} tokens`);\nconsole.log(`   Phase 0 Max      : ${preset.phase0_max_models} models`);\nconsole.log(`   Phase 2 Max      : ${preset.phase2_max_models} models`);\nconsole.log(`   Max Price Prompt : $${(preset.max_price_prompt * 1_000_000).toFixed(2)}/1M tokens`);\nconsole.log('   Scoring Weights  :');\nfor (const [k, v] of Object.entries(preset.scoring_weights)) {\n  const bar = '█'.repeat(Math.round(v * 20));\n  console.log(`     ${k.padEnd(20)} ${(v * 100).toFixed(0).padStart(3)}%  ${bar}`);\n}\nconsole.log('='.repeat(100) + '\\n');\n\n// Мёрджим конфиг с пресетом (пресет перекрывает дефолты)\nreturn [{\n  json: {\n    ...config,\n    ...preset,\n    scoring_weights: JSON.stringify(preset.scoring_weights),\n    task_mode_applied: taskMode,\n    task_mode_label: preset.label\n  }\n}];"
+      },
+      "id": "task-preset-node",
+      "name": "🎭 Apply Task Preset",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -144,
+        256
+      ],
+      "notes": "task_mode variants: universal | coding | reasoning | chatbot | economy | power | speed"
+    },
+    {
+      "parameters": {
+        "url": "https://openrouter.ai/api/v1/models",
+        "options": {}
+      },
+      "id": "fetch-catalog",
+      "name": "📡 Fetch Full OpenRouter Catalog",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        240,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// 🧠 PHASE 0: INTELLIGENT PRE-SCORING & FILTERING\n// Анализируем ВСЕ модели из каталога и выбираем лучшие по составному скору\n\nconst catalogData = $input.first().json;\nconst allModels = catalogData.data || [];\nconst config = $('🎭 Apply Task Preset').first().json;\n\nconsole.log('\\n' + '='.repeat(100));\nconsole.log('🧠 PHASE 0: INTELLIGENT MODEL PRE-SCORING & SELECTION');\nconsole.log('='.repeat(100));\nconsole.log(`📊 Total models in OpenRouter catalog: ${allModels.length}`);\n\n// Настройки фильтрации\nconst minContextLength = parseInt(config.min_context_length) || 32000;\nconst maxPricePrompt = parseFloat(config.max_price_prompt) || 0.000002; // $2 per 1M tokens\nconst maxPriceCompletion = parseFloat(config.max_price_completion) || 0.000004; // $4 per 1M tokens\nconst preferredSkills = (config.preferred_skills || 'code,reasoning,chat').split(',').map(s => s.trim());\n\n// Веса для комплексного скоринга (сумма = 1.0)\nconst weights = JSON.parse(config.scoring_weights || '{\"power\":0.3,\"cost_efficiency\":0.2,\"capability\":0.25,\"compatibility\":0.15,\"performance\":0.1}');\n\nconsole.log('\\n⚙️ Filtering & Scoring Configuration:');\nconsole.log(`   Min context length: ${minContextLength} tokens`);\nconsole.log(`   Max price (prompt): $${(maxPricePrompt * 1000000).toFixed(2)}/1M tokens`);\nconsole.log(`   Max price (completion): $${(maxPriceCompletion * 1000000).toFixed(2)}/1M tokens`);\nconsole.log(`   Preferred skills: ${preferredSkills.join(', ')}`);\nconsole.log(`   Scoring weights:`, weights);\n\n// Статистика\nlet stats = {\n  total: allModels.length,\n  free: 0,\n  russia_compatible: 0,\n  meets_context: 0,\n  has_metadata: 0,\n  final_selected: 0\n};\n\n// 1️⃣ ФИЛЬТРАЦИЯ: Бесплатные + совместимые с РФ + минимальный контекст\nconst filteredModels = allModels.filter(model => {\n  const id = (model.id || '').toLowerCase();\n  const pricing = model.pricing || {};\n  \n  // Критерий 1: Бесплатность\n  const isFreeByTag = id.includes(':free') || id.includes('/free');\n  const promptPrice = parseFloat(pricing.prompt) || 0;\n  const completionPrice = parseFloat(pricing.completion) || 0;\n  const isFreeByPrice = (promptPrice <= maxPricePrompt && completionPrice <= maxPriceCompletion);\n  const isFree = isFreeByTag || isFreeByPrice;\n  \n  if (!isFree) return false;\n  stats.free++;\n  \n  // Критерий 2: Совместимость с РФ (исключаем заблокированные модели)\n  const blockedForRussia = [\n    'claude-3', 'gpt-4o', 'gpt-4-turbo', 'gemini-1.5', \n    'o1-mini', 'o1-preview', 'gpt-3.5-turbo-0125'\n  ];\n  const isBlocked = blockedForRussia.some(blocked => id.includes(blocked));\n  \n  if (isBlocked) return false;\n  stats.russia_compatible++;\n  \n  // Критерий 3: Минимальный контекст\n  const contextLength = model.context_length || 0;\n  if (contextLength < minContextLength) return false;\n  stats.meets_context++;\n  \n  return true;\n});\n\nconsole.log(`\\n📊 Filtering Results:`);\nconsole.log(`   Total models: ${stats.total}`);\nconsole.log(`   Free models: ${stats.free}`);\nconsole.log(`   Russia-compatible: ${stats.russia_compatible}`);\nconsole.log(`   Meets context requirement (≥${minContextLength}): ${stats.meets_context}`);\nconsole.log(`   ✅ Passed initial filtering: ${filteredModels.length}`);\n\n// 2️⃣ SCORING: Комплексная оценка каждой модели\nconst scoredModels = filteredModels.map(model => {\n  const id = model.id || '';\n  const pricing = model.pricing || {};\n  const contextLength = model.context_length || 0;\n  const architecture = model.architecture || {};\n  const modality = (architecture.modality || 'text->text').toLowerCase();\n  \n  // 📊 POWER SCORE (0-10): Размер контекста + архитектура\n  let powerScore = 0;\n  \n  // Контекст (0-5 баллов)\n  if (contextLength >= 200000) powerScore += 5;\n  else if (contextLength >= 128000) powerScore += 4;\n  else if (contextLength >= 64000) powerScore += 3;\n  else if (contextLength >= 32000) powerScore += 2;\n  else powerScore += 1;\n  \n  // Мультимодальность (0-3 балла)\n  if (modality.includes('image') || modality.includes('vision')) powerScore += 2;\n  if (modality.includes('audio') || modality.includes('video')) powerScore += 1;\n  \n  // Название модели содержит индикаторы мощности (0-2 балла)\n  const powerIndicators = ['405b', '200b', '120b', '110b', '70b'];\n  if (powerIndicators.some(ind => id.includes(ind))) powerScore += 2;\n  else if (id.includes('large') || id.includes('ultra')) powerScore += 1;\n  \n  powerScore = Math.min(10, powerScore); // Максимум 10\n  \n  // 💰 COST EFFICIENCY SCORE (0-10): Чем дешевле, тем лучше\n  const promptPrice = parseFloat(pricing.prompt) || 0;\n  const completionPrice = parseFloat(pricing.completion) || 0;\n  const avgPrice = (promptPrice + completionPrice) / 2;\n  \n  let costScore = 0;\n  if (avgPrice === 0) costScore = 10; // Абсолютно бесплатная\n  else if (avgPrice <= 0.0000005) costScore = 9; // $0.5/1M\n  else if (avgPrice <= 0.000001) costScore = 8; // $1/1M\n  else if (avgPrice <= 0.0000015) costScore = 7; // $1.5/1M\n  else if (avgPrice <= 0.000002) costScore = 5; // $2/1M\n  else costScore = 3;\n  \n  // 🧠 CAPABILITY SCORE (0-10): Навыки и функции\n  let capabilityScore = 5; // Базовый уровень\n  \n  // Определяем навыки модели по названию и архитектуре\n  const modelSkills = [];\n  if (id.includes('coder') || id.includes('code')) {\n    modelSkills.push('code');\n    capabilityScore += 2;\n  }\n  if (id.includes('reasoning') || id.includes('think')) {\n    modelSkills.push('reasoning');\n    capabilityScore += 2;\n  }\n  if (id.includes('chat') || id.includes('instruct')) {\n    modelSkills.push('chat');\n    capabilityScore += 1;\n  }\n  if (modality.includes('image') || modality.includes('vision')) {\n    modelSkills.push('vision');\n    capabilityScore += 1;\n  }\n  \n  // Бонус за соответствие предпочитаемым навыкам\n  const matchesPreferred = preferredSkills.some(skill => modelSkills.includes(skill));\n  if (matchesPreferred) capabilityScore += 1;\n  \n  capabilityScore = Math.min(10, capabilityScore);\n  \n  // 🌍 COMPATIBILITY SCORE (0-10): Доступность для РФ\n  let compatibilityScore = 5; // Базовый уровень (прошли фильтр)\n  \n  // Бонус для моделей от дружественных провайдеров\n  const friendlyProviders = ['deepseek', 'qwen', 'meta-llama', 'mistral', 'google/gemma', 'nvidia'];\n  if (friendlyProviders.some(provider => id.includes(provider))) compatibilityScore += 3;\n  \n  // Бонус для open-source моделей (чаще доступны)\n  if (id.includes('open') || id.includes(':free')) compatibilityScore += 2;\n  \n  compatibilityScore = Math.min(10, compatibilityScore);\n  \n  // ⚡ PERFORMANCE SCORE (0-10): Индикаторы производительности\n  let performanceScore = 5; // Нейтральный по умолчанию\n  \n  // Модели с \"fast\", \"instant\", \"turbo\" обычно быстрее\n  if (id.includes('fast') || id.includes('instant') || id.includes('turbo')) performanceScore += 3;\n  \n  // Более новые версии (v3, 2025, etc.) обычно лучше оптимизированы\n  if (id.match(/v3|2025|2024/)) performanceScore += 2;\n  \n  performanceScore = Math.min(10, performanceScore);\n  \n  // 🎯 COMPOSITE SCORE: Взвешенная сумма всех скоров\n  const compositeScore = \n    powerScore * weights.power +\n    costScore * weights.cost_efficiency +\n    capabilityScore * weights.capability +\n    compatibilityScore * weights.compatibility +\n    performanceScore * weights.performance;\n  \n  return {\n    model_id: id,\n    context_length: contextLength,\n    description: (model.description || '').substring(0, 150),\n    pricing: pricing,\n    architecture: architecture,\n    modality: modality,\n    \n    // Детальные скоры\n    scores: {\n      power: parseFloat(powerScore.toFixed(2)),\n      cost_efficiency: parseFloat(costScore.toFixed(2)),\n      capability: parseFloat(capabilityScore.toFixed(2)),\n      compatibility: parseFloat(compatibilityScore.toFixed(2)),\n      performance: parseFloat(performanceScore.toFixed(2)),\n      composite: parseFloat(compositeScore.toFixed(2))\n    },\n    \n    // Метаданные для анализа\n    skills: modelSkills,\n    avg_price: avgPrice,\n    is_multimodal: modality.includes('image') || modality.includes('vision'),\n    source: 'openrouter_catalog_scored'\n  };\n});\n\n// 3️⃣ СОРТИРОВКА: По комплексному скору (лучшие сверху)\nconst rankedModels = scoredModels.sort((a, b) => b.scores.composite - a.scores.composite);\n\n// 4️⃣ SELECTION: Топ-N моделей для Phase 1\nconst maxModels = parseInt(config.phase0_max_models) || 30;\nconst selectedModels = rankedModels.slice(0, maxModels);\nstats.final_selected = selectedModels.length;\n\nconsole.log(`\\n🏆 TOP ${selectedModels.length} MODELS (Pre-Scored for Phase 1):\\n`);\nselectedModels.forEach((m, i) => {\n  const skills = m.skills.length > 0 ? ` [${m.skills.join(', ')}]` : '';\n  const multimodal = m.is_multimodal ? ' 🎨' : '';\n  \n  console.log(`${(i+1).toString().padStart(2)}. ${m.model_id}${multimodal}`);\n  console.log(`    Composite: ${m.scores.composite.toFixed(2)}/10 | Context: ${m.context_length.toLocaleString()} | Price: $${(m.avg_price * 1000000).toFixed(2)}/1M`);\n  console.log(`    Scores: Power=${m.scores.power} | Cost=${m.scores.cost_efficiency} | Capability=${m.scores.capability} | Compat=${m.scores.compatibility} | Perf=${m.scores.performance}${skills}`);\n  console.log('---');\n});\n\nconsole.log('\\n' + '='.repeat(100));\nconsole.log(`✅ PHASE 0 COMPLETE: Selected ${stats.final_selected} best models for Phase 1 testing`);\nconsole.log('='.repeat(100) + '\\n');\n\nreturn selectedModels.map(m => ({ json: m }));"
+      },
+      "id": "phase0-scoring",
+      "name": "🧠 PHASE 0: Pre-Scoring & Selection",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        16,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "phase1-split",
+      "name": "📦 PHASE 1: Split (Quick Test)",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        240,
+        64
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const delay = ms => new Promise(resolve => setTimeout(resolve, ms));\nconst config = $('🎭 Apply Task Preset').first().json;\nconst rateLimit = config.rate_limit_ms || 2000;\nconst apiKey = config.openrouter_api_key;\n\nawait delay(rateLimit);\n\nconst modelData = $input.first().json;\nconsole.log(`\\n⏳ [PHASE 1] Quick test: ${modelData.model_id}`);\nconsole.log(`   Pre-score: ${modelData.scores.composite.toFixed(2)}/10`);\n\nreturn [{\n  json: {\n    ...modelData,\n    openrouter_api_key: apiKey,\n    started_at: Date.now(),\n    test_results: {}\n  }\n}];"
+      },
+      "id": "init-phase1",
+      "name": "🚀 Init Phase 1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        352,
+        272
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $json.openrouter_api_key }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"model\":\"{{$json.model_id}}\",\"messages\":[{\"role\":\"user\",\"content\":\"Respond with exactly: 'OK'\"}],\"max_tokens\":5,\"temperature\":0.1}",
+        "options": {
+          "timeout": 20000
+        }
+      },
+      "id": "test1-availability",
+      "name": "🧪 Test 1: Availability",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        480,
+        528
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const modelContext = $('🚀 Init Phase 1').first().json;\nconst testResponse = $input.first().json;\n\nconst success = !!testResponse.choices;\nconst latency = Date.now() - modelContext.started_at;\nconst cost = testResponse.usage?.cost || 0;\nconst response = testResponse.choices?.[0]?.message?.content || '';\n\nconsole.log(`${success ? '✅' : '❌'} Availability: ${latency}ms | Pre-score: ${modelContext.scores.composite.toFixed(2)}`);\n\nreturn [{\n  json: {\n    ...modelContext,\n    test_results: {\n      availability: { success, latency, cost, response: response.substring(0, 200) }\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        608,
+        256
+      ],
+      "id": "save-test1",
+      "name": "💾 Save Test 1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        736,
+        64
+      ],
+      "id": "collect-phase1",
+      "name": "📥 Collect Phase 1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 🎯 PHASE 1 ANALYSIS: Комбинируем Pre-Score + Test Results\nconst items = $input.all();\nconst config = $('🎭 Apply Task Preset').first().json;\n\nconsole.log('\\n' + '='.repeat(100));\nconsole.log('🎯 PHASE 1 ANALYSIS: Combining Pre-Scores with Availability Results');\nconsole.log('='.repeat(100));\n\nconst analyzed = items.map(item => {\n  const availability = item.json.test_results?.availability || {};\n  const preScore = item.json.scores?.composite || 0;\n  \n  // Если модель доступна, добавляем бонус за скорость\n  let finalScore = preScore;\n  if (availability.success) {\n    const latency = availability.latency || 999999;\n    // Бонус за быстрый ответ (макс +2 балла)\n    const speedBonus = Math.max(0, 2 - (latency / 5000));\n    finalScore += speedBonus;\n  } else {\n    // Штраф за недоступность\n    finalScore = finalScore * 0.3; // Сохраняем 30% скора для справки\n  }\n  \n  return {\n    ...item.json,\n    final_phase1_score: parseFloat(finalScore.toFixed(2)),\n    availability_status: availability.success ? 'available' : 'unavailable'\n  };\n});\n\nconst available = analyzed.filter(m => m.availability_status === 'available');\nconst unavailable = analyzed.filter(m => m.availability_status === 'unavailable');\n\nconsole.log(`\\n📊 Phase 1 Results:`);\nconsole.log(`   Total tested: ${items.length}`);\nconsole.log(`   ✅ Available: ${available.length}`);\nconsole.log(`   ❌ Unavailable: ${unavailable.length}`);\n\n// Сортируем по финальному скору\nconst sorted = available.sort((a, b) => b.final_phase1_score - a.final_phase1_score);\n\n// Отбираем топ-N для Phase 2\nconst maxForPhase2 = parseInt(config.phase2_max_models) || 10;\nconst selectedForPhase2 = sorted.slice(0, maxForPhase2);\n\nconsole.log(`\\n🏆 TOP ${selectedForPhase2.length} Models Selected for PHASE 2 (Detailed Testing):\\n`);\nselectedForPhase2.forEach((m, i) => {\n  const latency = m.test_results?.availability?.latency || 0;\n  const skills = m.skills?.join(', ') || 'general';\n  \n  console.log(`${(i+1).toString().padStart(2)}. ${m.model_id}`);\n  console.log(`    Final Score: ${m.final_phase1_score.toFixed(2)}/10 | Pre-Score: ${m.scores.composite.toFixed(2)} | Latency: ${latency}ms`);\n  console.log(`    Skills: ${skills} | Context: ${m.context_length.toLocaleString()}`);\n  console.log('---');\n});\n\nconsole.log('\\n' + '='.repeat(100));\nconsole.log('🚀 Proceeding to PHASE 2: Detailed Capability Testing');\nconsole.log('='.repeat(100) + '\\n');\n\nreturn selectedForPhase2.map(m => ({ json: m }));"
+      },
+      "id": "analyze-phase1",
+      "name": "🎯 Analyze Phase 1 & Select for Phase 2",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        256
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "phase2-split",
+      "name": "📦 PHASE 2: Split (Detailed Tests)",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1056,
+        64
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const delay = ms => new Promise(resolve => setTimeout(resolve, ms));\nconst config = $('🎭 Apply Task Preset').first().json;\nawait delay(config.rate_limit_ms || 2000);\n\nconst modelData = $input.first().json;\nconsole.log(`\\n⏳ [PHASE 2] Detailed tests: ${modelData.model_id}`);\n\nreturn [{ json: { ...modelData, started_at: Date.now() } }];"
+      },
+      "id": "init-phase2",
+      "name": "🚀 Init Phase 2",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1168,
+        272
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $json.openrouter_api_key }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"model\":\"{{$json.model_id}}\",\"messages\":[{\"role\":\"user\",\"content\":\"Analyze this Python code for security issues: `import os; password = \\\"admin123\\\"; os.system(f'echo {password}')`\"}],\"max_tokens\":300}",
+        "options": {
+          "timeout": 45000
+        }
+      },
+      "id": "test2",
+      "name": "🛡️ Test 2: Security",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1296,
+        128
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $json.openrouter_api_key }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"model\":\"{{$json.model_id}}\",\"messages\":[{\"role\":\"user\",\"content\":\"Refactor with type hints and error handling: `def add(a, b): return a + b`\"}],\"max_tokens\":400}",
+        "options": {
+          "timeout": 45000
+        }
+      },
+      "id": "test3",
+      "name": "✨ Test 3: Code Quality",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1584,
+        128
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $json.openrouter_api_key }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"model\":\"{{$json.model_id}}\",\"messages\":[{\"role\":\"user\",\"content\":\"A bat and ball cost $1.10 total. The bat costs $1.00 more than the ball. How much is the ball? Explain step-by-step.\"}],\"max_tokens\":500}",
+        "options": {
+          "timeout": 45000
+        }
+      },
+      "id": "test4",
+      "name": "🧠 Test 4: Reasoning",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1808,
+        128
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $json.openrouter_api_key }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"model\":\"{{$json.model_id}}\",\"messages\":[{\"role\":\"user\",\"content\":\"Write a docstring for: `def process_data(data, *, threshold=0.5, normalize=True):`\"}],\"max_tokens\":400}",
+        "options": {
+          "timeout": 45000
+        }
+      },
+      "id": "test5",
+      "name": "📚 Test 5: Documentation",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2032,
+        128
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const ctx = $('🚀 Init Phase 2').first().json;\nconst resp = $input.first().json;\nconst success = !!resp.choices;\nconst latency = Date.now() - ctx.started_at;\nconst tokens = resp.usage?.total_tokens || 0;\nconsole.log(`${success ? '✅' : '❌'} Security | ${latency}ms | ${tokens} tokens`);\nreturn [{ json: { ...ctx, test_results: { ...ctx.test_results, security: { success, latency, cost: resp.usage?.cost || 0, response: (resp.choices?.[0]?.message?.content || '').substring(0, 200), tokens } } } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1424,
+        128
+      ],
+      "id": "save-test2",
+      "name": "💾 Save T2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const ctx = $('💾 Save T2').first().json;\nconst resp = $input.first().json;\nconst success = !!resp.choices;\nconst latency = Date.now() - ctx.started_at;\nconst tokens = resp.usage?.total_tokens || 0;\nconsole.log(`${success ? '✅' : '❌'} Code Quality | ${latency}ms | ${tokens} tokens`);\nreturn [{ json: { ...ctx, test_results: { ...ctx.test_results, code_quality: { success, latency, cost: resp.usage?.cost || 0, response: (resp.choices?.[0]?.message?.content || '').substring(0, 200), tokens } } } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1680,
+        128
+      ],
+      "id": "save-test3",
+      "name": "💾 Save T3"
+    },
+    {
+      "parameters": {
+        "jsCode": "const ctx = $('💾 Save T3').first().json;\nconst resp = $input.first().json;\nconst success = !!resp.choices;\nconst latency = Date.now() - ctx.started_at;\nconst tokens = resp.usage?.total_tokens || 0;\nconsole.log(`${success ? '✅' : '❌'} Reasoning | ${latency}ms | ${tokens} tokens`);\nreturn [{ json: { ...ctx, test_results: { ...ctx.test_results, reasoning: { success, latency, cost: resp.usage?.cost || 0, response: (resp.choices?.[0]?.message?.content || '').substring(0, 200), tokens } } } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1904,
+        128
+      ],
+      "id": "save-test4",
+      "name": "💾 Save T4"
+    },
+    {
+      "parameters": {
+        "jsCode": "const ctx = $('💾 Save T4').first().json;\nconst resp = $input.first().json;\nconst success = !!resp.choices;\nconst latency = Date.now() - ctx.started_at;\nconst tokens = resp.usage?.total_tokens || 0;\nconsole.log(`${success ? '✅' : '❌'} Documentation | ${latency}ms | ${tokens} tokens`);\nreturn [{ json: { ...ctx, test_results: { ...ctx.test_results, documentation: { success, latency, cost: resp.usage?.cost || 0, response: (resp.choices?.[0]?.message?.content || '').substring(0, 200), tokens } } } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2128,
+        128
+      ],
+      "id": "save-test5",
+      "name": "💾 Save T5"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2272,
+        256
+      ],
+      "id": "collect-phase2",
+      "name": "📥 Collect Phase 2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst results = items.map(item => {\n  const tests = item.json.test_results || {};\n  let qualityScore = 0;\n  let successCount = 0;\n  let totalTokens = 0;\n  \n  for (const test in tests) {\n    const result = tests[test];\n    if (result.success) {\n      successCount++;\n      totalTokens += result.tokens || 0;\n      const response = (result.response || '').toLowerCase();\n      \n      // Оценка качества ответа\n      let score = 5;\n      switch(test) {\n        case 'availability': score = response.trim() === 'ok' ? 10 : 5; break;\n        case 'security': score = response.includes('vulnerability') || response.includes('security') ? 9 : 6; break;\n        case 'code_quality': score = response.includes('def ') && response.includes('return') ? 9 : 5; break;\n        case 'reasoning': score = response.includes('step') ? 9 : 5; break;\n        case 'documentation': score = response.includes('args:') ? 10 : 6; break;\n      }\n      qualityScore += score;\n    }\n  }\n  \n  const avgQuality = successCount > 0 ? qualityScore / successCount : 0;\n  const tokenEfficiency = totalTokens > 0 ? 10 - Math.min(10, totalTokens / 100) : 5; // Меньше токенов = лучше\n  \n  // ФИНАЛЬНЫЙ COMPOSITE SCORE = Pre-Score + Quality + Token Efficiency\n  const finalScore = \n    (item.json.scores?.composite || 0) * 0.4 +  // 40% от pre-score\n    avgQuality * 0.4 +                           // 40% от качества ответов\n    tokenEfficiency * 0.2;                       // 20% от эффективности токенов\n  \n  return {\n    model_id: item.json.model_id,\n    final_score: parseFloat(finalScore.toFixed(2)),\n    pre_score: item.json.scores?.composite || 0,\n    quality_score: parseFloat(avgQuality.toFixed(2)),\n    token_efficiency: parseFloat(tokenEfficiency.toFixed(2)),\n    success_rate: `${successCount}/5`,\n    total_tokens: totalTokens,\n    context_length: item.json.context_length,\n    skills: item.json.skills || [],\n    test_results: tests\n  };\n}).sort((a, b) => b.final_score - a.final_score);\n\nconsole.log('\\n' + '='.repeat(100));\nconsole.log('🏆 FINAL RANKING (Best Models)');\nconsole.log('='.repeat(100) + '\\n');\n\nresults.forEach((r, i) => {\n  console.log(`${(i+1).toString().padStart(2)}. ${r.model_id}`);\n  console.log(`    Final: ${r.final_score.toFixed(2)} = PreScore(${r.pre_score.toFixed(1)}) + Quality(${r.quality_score.toFixed(1)}) + TokenEff(${r.token_efficiency.toFixed(1)})`);\n  console.log(`    Success: ${r.success_rate} | Tokens: ${r.total_tokens} | Skills: [${r.skills.join(', ')}]`);\n  console.log('---');\n});\n\nreturn results.map(r => ({ json: r }));"
+      },
+      "id": "final-ranking",
+      "name": "📊 Final Ranking & Analysis",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2448,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        2880,
+        480
+      ],
+      "id": "export-file",
+      "name": "📄 Export Results"
+    },
+    {
+      "id": "html-report-node",
+      "name": "📈 HTML Report Generator",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        2640,
+        480
+      ],
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst models = items.map(i => i.json);\nconst config = $('🎭 Apply Task Preset').first().json;\nconst mode = config.task_mode_label || config.task_mode_applied || 'universal';\nconst ts = new Date().toLocaleString('ru-RU');\n\nconst sc = v => {\n  if (v >= 8) return '#22c55e';\n  if (v >= 6) return '#f59e0b';\n  if (v >= 4) return '#f97316';\n  return '#ef4444';\n};\nconst bar = (v, max=10) => {\n  const pct = Math.min(100, (v/max)*100).toFixed(1);\n  const col = sc(v);\n  return `<div style=\"background:#1e293b;border-radius:4px;height:10px;width:100%;\"><div style=\"background:${col};width:${pct}%;height:10px;border-radius:4px;transition:width .3s\"></div></div><span style=\"font-size:11px;color:${col};font-weight:700\">${v.toFixed(1)}</span>`;\n};\nconst badge = txt => `<span style=\"background:#334155;color:#94a3b8;padding:2px 7px;border-radius:20px;font-size:11px;\">${txt}</span>`;\nconst tick = ok => ok ? '✅' : '❌';\n\nconst rows = models.map((m, i) => {\n  const tr = m.test_results || {};\n  const avail = tr.availability || {};\n  const sec   = tr.security || {};\n  const code  = tr.code_quality || {};\n  const reas  = tr.reasoning || {};\n  const docs  = tr.documentation || {};\n  const skills = (m.skills || []).map(badge).join(' ');\n  const ctx = (m.context_length||0) >= 100000\n    ? `<span style=\"color:#818cf8\">${((m.context_length||0)/1000).toFixed(0)}k</span>`\n    : `${((m.context_length||0)/1000).toFixed(0)}k`;\n  const medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':`<b style=\"color:#64748b\">${i+1}</b>`;\n\n  return `<tr style=\"border-bottom:1px solid #1e293b;\">\n    <td style=\"padding:12px 8px;text-align:center;\">${medal}</td>\n    <td style=\"padding:12px 8px;\">\n      <div style=\"font-weight:700;color:#e2e8f0;font-size:13px;\">${m.model_id}</div>\n      <div style=\"margin-top:4px;\">${skills}</div>\n    </td>\n    <td style=\"padding:12px 8px;text-align:center;\">${ctx}</td>\n    <td style=\"padding:12px 8px;min-width:120px;\">${bar(m.final_score||0)}</td>\n    <td style=\"padding:12px 8px;min-width:100px;\">${bar(m.pre_score||0)}</td>\n    <td style=\"padding:12px 8px;min-width:100px;\">${bar(m.quality_score||0)}</td>\n    <td style=\"padding:12px 8px;min-width:100px;\">${bar(m.token_efficiency||0)}</td>\n    <td style=\"padding:12px 8px;text-align:center;\">${tick(avail.success)} ${avail.latency ? `<span style=\"color:#64748b;font-size:11px\">${avail.latency}ms</span>` : ''}</td>\n    <td style=\"padding:12px 8px;text-align:center;\">${tick(sec.success)}</td>\n    <td style=\"padding:12px 8px;text-align:center;\">${tick(code.success)}</td>\n    <td style=\"padding:12px 8px;text-align:center;\">${tick(reas.success)}</td>\n    <td style=\"padding:12px 8px;text-align:center;\">${tick(docs.success)}</td>\n    <td style=\"padding:12px 8px;text-align:center;color:#64748b;font-size:12px;\">${m.success_rate||'-'}</td>\n    <td style=\"padding:12px 8px;text-align:center;color:#64748b;font-size:12px;\">${m.total_tokens||0}</td>\n  </tr>`;\n}).join('');\n\nconst totalOk = models.filter(m => (m.success_rate||'0/5').startsWith(4)||parseFloat((m.success_rate||'0').split('/')[0])>=4).length;\nconst avgFinal = models.length ? (models.reduce((a,m)=>a+(m.final_score||0),0)/models.length).toFixed(2) : 0;\nconst avgTokens = models.length ? Math.round(models.reduce((a,m)=>a+(m.total_tokens||0),0)/models.length) : 0;\nconst best = models[0];\n\nconst html = `<!DOCTYPE html>\n<html lang=\"ru\">\n<head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<title>🤖 OpenRouter Model Report</title>\n<style>\n  *{box-sizing:border-box;margin:0;padding:0}\n  body{font-family:'Segoe UI',system-ui,sans-serif;background:#0f172a;color:#cbd5e1;min-height:100vh;padding:24px}\n  h1{font-size:28px;font-weight:800;color:#e2e8f0;margin-bottom:4px}\n  .sub{color:#64748b;font-size:14px;margin-bottom:24px}\n  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:28px}\n  .card{background:#1e293b;border-radius:12px;padding:20px;border:1px solid #334155}\n  .card-val{font-size:32px;font-weight:800;color:#818cf8;line-height:1}\n  .card-label{font-size:13px;color:#64748b;margin-top:6px}\n  .card-best{font-size:12px;color:#22c55e;margin-top:4px;word-break:break-all}\n  .section-title{font-size:16px;font-weight:700;color:#94a3b8;margin:28px 0 12px;letter-spacing:.5px;text-transform:uppercase}\n  .table-wrap{overflow-x:auto;border-radius:12px;border:1px solid #334155}\n  table{border-collapse:collapse;width:100%;background:#1e293b;font-size:13px}\n  th{background:#0f172a;color:#64748b;padding:10px 8px;text-align:left;font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #334155;white-space:nowrap}\n  tr:hover{background:#273449}\n  .pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600}\n  .pill-mode{background:#312e81;color:#818cf8}\n  .legend{display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap}\n  .leg-item{display:flex;align-items:center;gap:6px;font-size:12px;color:#64748b}\n  .leg-dot{width:12px;height:12px;border-radius:50%}\n  .footer{margin-top:32px;text-align:center;color:#334155;font-size:12px}\n  .top-model{background:linear-gradient(135deg,#1e293b,#1a1f3a);border:1px solid #4f46e5;border-radius:12px;padding:20px;margin-bottom:28px}\n  .top-model-title{font-size:12px;color:#818cf8;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}\n  .top-model-name{font-size:22px;font-weight:800;color:#e2e8f0;margin-bottom:12px;word-break:break-all}\n  .scores-inline{display:flex;gap:20px;flex-wrap:wrap}\n  .score-item{text-align:center}\n  .score-val{font-size:20px;font-weight:800}\n  .score-lbl{font-size:11px;color:#64748b;margin-top:2px}\n</style>\n</head>\n<body>\n<h1>🤖 OpenRouter Free Model Report</h1>\n<div class=\"sub\">📅 ${ts} &nbsp;|&nbsp; <span class=\"pill pill-mode\">${mode}</span> &nbsp;|&nbsp; Проанализировано моделей: <b>${models.length}</b></div>\n\n<div class=\"grid\">\n  <div class=\"card\"><div class=\"card-val\">${models.length}</div><div class=\"card-label\">Финальных моделей</div></div>\n  <div class=\"card\"><div class=\"card-val\" style=\"color:#22c55e\">${avgFinal}</div><div class=\"card-label\">Средний финальный скор</div></div>\n  <div class=\"card\"><div class=\"card-val\" style=\"color:#f59e0b\">${totalOk}</div><div class=\"card-label\">Прошли ≥4 из 5 тестов</div></div>\n  <div class=\"card\"><div class=\"card-val\" style=\"color:#94a3b8\">${avgTokens}</div><div class=\"card-label\">Среднее кол-во токенов</div></div>\n</div>\n\n${best ? `<div class=\"top-model\">\n  <div class=\"top-model-title\">🏆 Лучшая модель</div>\n  <div class=\"top-model-name\">${best.model_id}</div>\n  <div class=\"scores-inline\">\n    <div class=\"score-item\"><div class=\"score-val\" style=\"color:#818cf8\">${(best.final_score||0).toFixed(2)}</div><div class=\"score-lbl\">Final Score</div></div>\n    <div class=\"score-item\"><div class=\"score-val\" style=\"color:#22c55e\">${(best.pre_score||0).toFixed(2)}</div><div class=\"score-lbl\">Pre-Score</div></div>\n    <div class=\"score-item\"><div class=\"score-val\" style=\"color:#f59e0b\">${(best.quality_score||0).toFixed(2)}</div><div class=\"score-lbl\">Quality</div></div>\n    <div class=\"score-item\"><div class=\"score-val\" style=\"color:#38bdf8\">${(best.token_efficiency||0).toFixed(2)}</div><div class=\"score-lbl\">Token Eff</div></div>\n    <div class=\"score-item\"><div class=\"score-val\" style=\"color:#a3e635\">${best.success_rate||'-'}</div><div class=\"score-lbl\">Tests Passed</div></div>\n    <div class=\"score-item\"><div class=\"score-val\" style=\"color:#94a3b8\">${((best.context_length||0)/1000).toFixed(0)}k</div><div class=\"score-lbl\">Context</div></div>\n  </div>\n</div>` : ''}\n\n<div class=\"section-title\">📊 Полная таблица моделей</div>\n<div class=\"legend\">\n  <div class=\"leg-item\"><div class=\"leg-dot\" style=\"background:#22c55e\"></div> Отлично (≥8.0)</div>\n  <div class=\"leg-item\"><div class=\"leg-dot\" style=\"background:#f59e0b\"></div> Хорошо (6-8)</div>\n  <div class=\"leg-item\"><div class=\"leg-dot\" style=\"background:#f97316\"></div> Средне (4-6)</div>\n  <div class=\"leg-item\"><div class=\"leg-dot\" style=\"background:#ef4444\"></div> Слабо (&lt;4)</div>\n</div>\n<div class=\"table-wrap\">\n<table>\n  <thead><tr>\n    <th>#</th>\n    <th>Модель / Навыки</th>\n    <th>Context</th>\n    <th>🏅 Final Score</th>\n    <th>📊 Pre-Score</th>\n    <th>🎯 Quality</th>\n    <th>⚡ Token Eff</th>\n    <th>✅ Test 1 Availability</th>\n    <th>🛡️ T2 Sec</th>\n    <th>✨ T3 Code</th>\n    <th>🧠 T4 Reason</th>\n    <th>📚 T5 Docs</th>\n    <th>Pass Rate</th>\n    <th>Tokens</th>\n  </tr></thead>\n  <tbody>${rows}</tbody>\n</table>\n</div>\n<div class=\"footer\">Generated by OpenRouter Advanced THREE PHASE Workflow &mdash; ${ts}</div>\n</body></html>`;\n\nreturn [{ json: { html_report: html, generated_at: ts, models_count: models.length, best_model: best?.model_id || 'N/A' } }];"
+      },
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "manual-check",
+              "leftValue": "={{ $json.manual_models }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "mode-router",
+      "name": "🔀 Manual or Auto Mode?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        48,
+        256
+      ],
+      "notes": "true → ручной список моделей, false → автопоиск по всему каталогу"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 📋 BUILD MANUAL MODEL LIST\n// Пользователь задал список моделей вручную в ⚙️ Configuration → manual_models\n// Формируем объекты совместимые с форматом Phase 1\n\nconst config = $input.first().json;\nconst raw = config.manual_models || '';\nconst modelIds = raw.split(',').map(s => s.trim()).filter(Boolean);\n\nif (modelIds.length === 0) {\n  throw new Error('manual_models пуст! Добавьте ID моделей через запятую в настройках.');\n}\n\nconsole.log('\\n' + '='.repeat(80));\nconsole.log('📋 MANUAL MODE: Testing specific models only');\nconsole.log('='.repeat(80));\nconsole.log(`\\n🎯 Models to test (${modelIds.length}):`);\nmodelIds.forEach((id, i) => console.log(`  ${i+1}. ${id}`));\nconsole.log('\\n' + '='.repeat(80) + '\\n');\n\n// Создаём объекты в формате Phase 1 (нейтральные pre-scores)\nreturn modelIds.map(id => ({\n  json: {\n    model_id: id,\n    context_length: 0,\n    description: 'Manual selection',\n    pricing: {},\n    architecture: {},\n    modality: 'text->text',\n    scores: {\n      power: 5.0,\n      cost_efficiency: 5.0,\n      capability: 5.0,\n      compatibility: 5.0,\n      performance: 5.0,\n      composite: 5.0\n    },\n    skills: [],\n    avg_price: 0,\n    is_multimodal: false,\n    source: 'manual_selection',\n    manual_mode: true,\n    openrouter_api_key: config.openrouter_api_key\n  }\n}));"
+      },
+      "id": "manual-list-node",
+      "name": "📋 Build Manual Model List",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const html = $json.html_report;\nif (!html) {\n  return [{ json: { status: 'error', message: 'No HTML content found' } }];\n}\n\n// Save to Desktop\nconst fs = require('fs');\nconst os = require('os');\nconst path = require('path');\n\nconst desktop = path.join(os.homedir(), 'Desktop');\nconst filename = path.join(desktop, 'openrouter_report.html');\n\nfs.writeFileSync(filename, html, 'utf-8');\n\nreturn [{\n  json: {\n    status: 'saved',\n    file_path: filename,\n    message: 'HTML-отчёт сохранён на Рабочий стол: openrouter_report.html',\n    models_count: $json.models_count,\n    best_model: $json.best_model,\n    generated_at: $json.generated_at\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2880,
+        680
+      ],
+      "id": "save-html-node",
+      "name": "💾 Save HTML to Desktop"
+    }
+  ],
+  "connections": {
+    "▶️ Start Workflow": {
+      "main": [
+        [
+          {
+            "node": "⚙️ Configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⚙️ Configuration": {
+      "main": [
+        [
+          {
+            "node": "🎭 Apply Task Preset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🎭 Apply Task Preset": {
+      "main": [
+        [
+          {
+            "node": "🔀 Manual or Auto Mode?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📡 Fetch Full OpenRouter Catalog": {
+      "main": [
+        [
+          {
+            "node": "🧠 PHASE 0: Pre-Scoring & Selection",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🧠 PHASE 0: Pre-Scoring & Selection": {
+      "main": [
+        [
+          {
+            "node": "📦 PHASE 1: Split (Quick Test)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📦 PHASE 1: Split (Quick Test)": {
+      "main": [
+        [
+          {
+            "node": "📥 Collect Phase 1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "🚀 Init Phase 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🚀 Init Phase 1": {
+      "main": [
+        [
+          {
+            "node": "🧪 Test 1: Availability",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🧪 Test 1: Availability": {
+      "main": [
+        [
+          {
+            "node": "💾 Save Test 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "💾 Save Test 1": {
+      "main": [
+        [
+          {
+            "node": "📥 Collect Phase 1",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "📦 PHASE 1: Split (Quick Test)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📥 Collect Phase 1": {
+      "main": [
+        [
+          {
+            "node": "🎯 Analyze Phase 1 & Select for Phase 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🎯 Analyze Phase 1 & Select for Phase 2": {
+      "main": [
+        [
+          {
+            "node": "📦 PHASE 2: Split (Detailed Tests)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📦 PHASE 2: Split (Detailed Tests)": {
+      "main": [
+        [
+          {
+            "node": "📥 Collect Phase 2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "🚀 Init Phase 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🚀 Init Phase 2": {
+      "main": [
+        [
+          {
+            "node": "🛡️ Test 2: Security",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🛡️ Test 2: Security": {
+      "main": [
+        [
+          {
+            "node": "💾 Save T2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "💾 Save T2": {
+      "main": [
+        [
+          {
+            "node": "✨ Test 3: Code Quality",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "✨ Test 3: Code Quality": {
+      "main": [
+        [
+          {
+            "node": "💾 Save T3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "💾 Save T3": {
+      "main": [
+        [
+          {
+            "node": "🧠 Test 4: Reasoning",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🧠 Test 4: Reasoning": {
+      "main": [
+        [
+          {
+            "node": "💾 Save T4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "💾 Save T4": {
+      "main": [
+        [
+          {
+            "node": "📚 Test 5: Documentation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📚 Test 5: Documentation": {
+      "main": [
+        [
+          {
+            "node": "💾 Save T5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "💾 Save T5": {
+      "main": [
+        [
+          {
+            "node": "📥 Collect Phase 2",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "📦 PHASE 2: Split (Detailed Tests)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📥 Collect Phase 2": {
+      "main": [
+        [
+          {
+            "node": "📊 Final Ranking & Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📊 Final Ranking & Analysis": {
+      "main": [
+        [
+          {
+            "node": "📈 HTML Report Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📈 HTML Report Generator": {
+      "main": [
+        [
+          {
+            "node": "📄 Export Results",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "💾 Save HTML to Desktop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "рџ“€ HTML Report Generator": {
+      "main": [
+        [
+          {
+            "node": "рџ“„ Export Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🔀 Manual or Auto Mode?": {
+      "main": [
+        [
+          {
+            "node": "📋 Build Manual Model List",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "📡 Fetch Full OpenRouter Catalog",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📋 Build Manual Model List": {
+      "main": [
+        [
+          {
+            "node": "📦 PHASE 1: Split (Quick Test)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "id": "advanced-three-phase",
+  "tags": []
+}
